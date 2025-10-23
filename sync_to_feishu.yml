@@ -1,0 +1,32 @@
+name: Weread to Feishu Sync
+
+on:
+  workflow_dispatch: # 允许手动触发
+  schedule:
+    - cron: "0 16 * * *" # 每天UTC时间16点（北京时间次日0点）运行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run sync script
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_APP_TOKEN: ${{ secrets.FEISHU_APP_TOKEN }}
+          FEISHU_TABLE_ID: ${{ secrets.FEISHU_TABLE_ID }}
+          WEREAD_COOKIE: ${{ secrets.WEREAD_COOKIE }}
+        run: |
+          python weread_to_feishu.py
